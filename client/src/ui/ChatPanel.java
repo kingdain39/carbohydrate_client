@@ -65,7 +65,7 @@ public class ChatPanel extends JPanel {
                 BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(230, 230, 230)),
                 BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
-
+        // 기능은 없는데 잇길래 만듦
         JButton plusButton = new JButton("+");
         plusButton.setFont(new Font("맑은 고딕", Font.BOLD, 20));
         plusButton.setPreferredSize(new Dimension(45, 45));
@@ -115,8 +115,9 @@ public class ChatPanel extends JPanel {
 
         add(inputPanel, BorderLayout.SOUTH);
 
-        // 이벤트
+        // 이벤트 달아놓음. 전송버튼 클릭
         sendButton.addActionListener(e -> sendMessage());
+        //엔터로 쳣을때도 보내짐
         inputField.addActionListener(e -> sendMessage());
     }
 
@@ -194,7 +195,7 @@ public class ChatPanel extends JPanel {
         }
     }
 
-    // 스타일 지정 메시지 추가
+    // 스타일지정 메시지 추가(귓속말처리해야해서)
     private void appendMessageWithStyle(String prefix, String content, Color color, boolean isWhisper) {
         StyledDocument doc = chatArea.getStyledDocument();
         String time = LocalTime.now().format(timeFormatter);
