@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry excluding="service/" kind="src" path="client/src"/>
+	<classpathentry kind="src" path="client/src/service"/>
+	<classpathentry kind="output" path="out/production/client"/>
+</classpath>
