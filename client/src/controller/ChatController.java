@@ -1,6 +1,6 @@
 package controller;
 
-public class ChatController {
+public class ChatController  {
 	public void sendMessage() {
 		
 	}

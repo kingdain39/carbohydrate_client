@@ -1,4 +1,4 @@
 @FunctionalInterface
-public class MessageHandler {
+public interface MessageHandler {
 	 void handle(String payload);
 }

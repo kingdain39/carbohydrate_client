@@ -1,3 +1,4 @@
+import java.util.function.Consumer;
 
 public interface NetworkService {
 	void connect(String url, Runnable onConnected, Consumer<Throwable> onError);
