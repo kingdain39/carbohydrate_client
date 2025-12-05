@@ -7,4 +7,5 @@ public interface NetworkService {
     void subscribe(String destination, MessageHandler handler);
     void send(String destination, Object payload);
     boolean isConnected();
+	
 }
