@@ -1,6 +1,7 @@
 package service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,6 +18,7 @@ public class ChatService {
 	private final NetworkService networkService; //네트워크 통신담당
 	private final ObjectMapper objectMapper;//json 객체 변환기
 	private Long currentUserId;//현재 사용자 id
+	private UserStateService userService;
 	
 	//이벤트 리스너 (Controller가 등록)
 	private Consumer<ChatMessageResponse> onMessageReceived;
@@ -63,6 +65,7 @@ public class ChatService {
         networkService.subscribe("/topic/public", this::handlePublicMessage);
         networkService.subscribe("/user/queue/whisper", this::handleWhisperMessage);
         networkService.subscribe("/user/queue/history", this::handleHistoryMessage);
+        networkService.subscribe("/topic/users", this::handleUserListMessage);
 
         // 그 다음 입장 요청
         requestJoin();
@@ -113,6 +116,18 @@ public class ChatService {
         }
     }
     
+    private void handleUserListMessage(String json) {
+    	try {
+            Map<String, Long> users = objectMapper.readValue(
+                json, new TypeReference<Map<String, Long>>() {}
+            );
+            userService.updateActiveUsers(users); // UserStateService 갱신
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+
+    
     public void disconnect() {
         networkService.disconnect();
     }
@@ -125,6 +140,7 @@ public class ChatService {
 		return networkService;
 	}
 
+	
 	
 
 }
