@@ -16,9 +16,9 @@ public class ChatController  {
     private final UserStateService userStateService;
     
     // View 컴포넌트 (팀원들이 만든 UI)
-    private JPanel chatView; 
-    private JPanel loginView;
-    private JPanel registerView;
+    private ChatPanel chatView;
+    private LoginPanel loginView;
+    private RegisterPanel registerView;
     
     public ChatController(ChatService chatService, UserStateService userStateService) {
         this.chatService = chatService;
@@ -26,7 +26,7 @@ public class ChatController  {
     }
     
  // 초기화 (View 연결)
-    public void initialize(JPanel view, Long userId) {
+    public void initialize(ChatPanel view, Long userId) {
         this.chatView = view;
         
         // Service → Controller 리스너 등록
@@ -35,7 +35,7 @@ public class ChatController  {
         
         // View → Controller 이벤트 연결
         view.setOnSendMessage(this::onSendButtonClick);
-        view.setOnSendWhisper(this::onWhisperButtonClick);
+        //view.setOnSendWhisper(this::onWhisperButtonClick); //우리 어차피 귓속말 버튼 없이 /w로 파싱하니까 없앰.
         view.setOnDisconnect(this::onDisconnect);
         view.setOnJoin(this::onJoinButtonClick); 
     }
@@ -62,7 +62,7 @@ public class ChatController  {
               chatService.sendPublicMessage(trimmed);
           }
     }
-    
+
     private void handleWhisperCommand(String command) {
         // "/w 받는사람 메시지내용" 형식 파싱
         String[] parts = command.substring(3).split(" ", 2); // "/w " 제거 후 공백 기준 2개로 분리
@@ -142,5 +142,6 @@ public class ChatController  {
     
     private void showError(String content) {
     	//chatView.showError(string);
+        chatView.addSystemMessage("ERROR: " + content);
     }
 }
