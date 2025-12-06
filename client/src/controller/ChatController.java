@@ -2,6 +2,8 @@ package controller;
 
 import java.util.Set;
 
+import javax.swing.JPanel;
+
 import dto.ChatMessageResponse;
 import service.ChatService;
 import service.UserStateService;
@@ -14,9 +16,9 @@ public class ChatController  {
     private final UserStateService userStateService;
     
     // View 컴포넌트 (팀원들이 만든 UI)
-    private ChatPanel chatView;  // 인터페이스로 추상화 권장
-    private ChatPanel loginView;
-    private ChatPanel registerView;
+    private JPanel chatView; 
+    private JPanel loginView;
+    private JPanel registerView;
     
     public ChatController(ChatService chatService, UserStateService userStateService) {
         this.chatService = chatService;
@@ -24,7 +26,7 @@ public class ChatController  {
     }
     
  // 초기화 (View 연결)
-    public void initialize(ChatPanel view, Long userId) {
+    public void initialize(JPanel view, Long userId) {
         this.chatView = view;
         
         // Service → Controller 리스너 등록

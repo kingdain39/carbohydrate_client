@@ -28,8 +28,6 @@ public class ChatPanel extends JPanel {
 	private Long myId;
     private String myName;
 
-
-
 	/**
 	 * Create the panel.
 	 */
