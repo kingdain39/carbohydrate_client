@@ -63,7 +63,7 @@ public class ChatClientApp extends JFrame {
         cardLayout.show(mainPanel, "CHAT");
 
         // TODO: 실제 서버 연결
-        chatPanel.addSystemMessage(userName + "님이 입장하셨습니다.");
+       // chatPanel.addSystemMessage(userName + "님이 입장하셨습니다.");
     }
 
     // 회원가입 성공 시
