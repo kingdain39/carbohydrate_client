@@ -63,6 +63,7 @@ public class ChatService {
         networkService.subscribe("/topic/public", this::handlePublicMessage);
         networkService.subscribe("/user/queue/whisper", this::handleWhisperMessage);
         networkService.subscribe("/user/queue/history", this::handleHistoryMessage);
+
         // 그 다음 입장 요청
         requestJoin();
     }
