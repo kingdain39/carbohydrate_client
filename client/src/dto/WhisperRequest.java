@@ -4,6 +4,12 @@ public class WhisperRequest {
 	private Long senderId;
     private Long recipientId;
     private String content;
+	public WhisperRequest(Long currentUserId, Long recipientId2, String content2) {
+		// TODO Auto-generated constructor stub
+		this.senderId=currentUserId;
+		this.recipientId=recipientId2;
+		this.content=content2;
+	}
 	public Long getSenderId() {
 		return senderId;
 	}

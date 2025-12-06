@@ -14,7 +14,6 @@ public class ChatController  {
     public ChatController(ChatService chatService, UserStateService userStateService) {
         this.chatService = chatService;
         this.userStateService = userStateService;
-        
     }
     
 	public void sendMessage() {
