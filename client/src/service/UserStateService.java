@@ -30,4 +30,9 @@ public class UserStateService {
 	   public boolean isUserActive(String username) {
 	        return activeUsers.contains(username);
 	    }
+
+	public Long getUserIdByName(String recipientName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
