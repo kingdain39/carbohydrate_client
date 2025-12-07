@@ -16,6 +16,7 @@ public class ChatService {
 	private final NetworkService networkService; //네트워크 통신담당
 	private final ObjectMapper objectMapper;//json 객체 변환기
 	private Long currentUserId;//현재 사용자 id
+    private String currentUserName;
 	private UserStateService userService;
     private String jwtToken;
 	
@@ -32,8 +33,9 @@ public class ChatService {
 	}
 	
 	// 연결 및 구독 초기화
-    public void initialize(Long userId, String jwtToken, Consumer<ChatMessageResponse> messageListener, Runnable onConnectedCallback) {
+    public void initialize(Long userId, String userName, String jwtToken, Consumer<ChatMessageResponse> messageListener, Runnable onConnectedCallback) {
         this.currentUserId = userId;
+        this.currentUserName = userName;
         this.onMessageReceived = messageListener;
 
         String serverUrl = "ws://localhost:8080/ws";
@@ -71,7 +73,7 @@ public class ChatService {
     public void joinChatRoom() {
         // 구독 먼저
         networkService.subscribe("/topic/public", this::handlePublicMessage);
-        networkService.subscribe("/user/queue/whisper", this::handleWhisperMessage);
+        networkService.subscribe("/topic/private/" + currentUserName, this::handleWhisperMessage);
         networkService.subscribe("/user/queue/history", this::handleHistoryMessage);
         networkService.subscribe("/topic/users", this::handleUserListMessage);
 

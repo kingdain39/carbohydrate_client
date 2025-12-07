@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Color; //색갈
 import java.time.LocalDateTime;
 import java.time.LocalTime; //시간
+import javax.swing.SwingUtilities;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
@@ -40,7 +41,7 @@ public class ChatPanel extends JPanel {
 	private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
 
-	private Long myId;      
+	private Long myId;
     private String myName;
 
 	//얘네들은 컨트롤러에서 받아오는 전송버튼눌렀는지/입장했는지/퇴장했는지 변수
@@ -55,29 +56,29 @@ public class ChatPanel extends JPanel {
 	 */
 	public ChatPanel() {
 	    setLayout(new BorderLayout(0, 0));
-	    
+
 	    headerPanel = new JPanel();
-	    headerPanel.setLayout(new BorderLayout(0, 0)); 
-	    headerPanel.setPreferredSize(new Dimension(0, 60));  
+	    headerPanel.setLayout(new BorderLayout(0, 0));
+	    headerPanel.setPreferredSize(new Dimension(0, 60));
 	    add(headerPanel, BorderLayout.NORTH);
-	    
+
 	    headerLable = new JLabel("귓속말채팅 프로그램");
 	    headerLable.setFont(new Font("맑은 고딕", Font.BOLD, 18));
-	    headerPanel.add(headerLable, BorderLayout.WEST); 
-	    
+	    headerPanel.add(headerLable, BorderLayout.WEST);
+
 	    inOneSuLabel = new JLabel("👤 0");
-	    inOneSuLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 15));
-	    headerPanel.add(inOneSuLabel, BorderLayout.EAST);  
-	    
+	    inOneSuLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 15));
+	    headerPanel.add(inOneSuLabel, BorderLayout.EAST);
+
 	    chatArea = new JTextPane();
 	    chatArea.setEditable(false);  //챗area를 수정불가하게 만들기 위함!!!!!!!!
 	    chatArea.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-	    
+
 	    scrollPane = new JScrollPane(chatArea);
 	    add(scrollPane, BorderLayout.CENTER);
-	    
+
 	    inputPanel = new JPanel();
-	    inputPanel.setLayout(new BorderLayout(10, 0)); 
+	    inputPanel.setLayout(new BorderLayout(10, 0));
 	    add(inputPanel, BorderLayout.SOUTH);
 
 	    inputField = new JTextField();
@@ -87,7 +88,7 @@ public class ChatPanel extends JPanel {
 	    sendButton = new JButton("전송");
 	    sendButton.setFont(new Font("맑은 고딕", Font.BOLD, 14));
 	    inputPanel.add(sendButton, BorderLayout.EAST);
-	    
+
 	    sendButton.addActionListener(e -> sendMessage());
 	    inputField.addActionListener(e -> sendMessage()); //엔터쳐도 들어갈 수 있게!!
 
@@ -111,18 +112,18 @@ public class ChatPanel extends JPanel {
 	public void setOnDisconnect(Runnable listener) {
 		this.onDisconnectListener = listener;
 	}
-	
+
 	//현재 사용자 정보 세터
 	public void setUserInfo(Long userId, String userName) {
 	    this.myId = userId;
 	    this.myName = userName;
 	}
-	
-	
+
+
 	// 메시지 전송
 	private void sendMessage() {
 	    String content = inputField.getText().trim();
-	    
+
 	    //빈 메시지 체크
 	    if (content.isEmpty()) {
 	        return;
@@ -131,34 +132,36 @@ public class ChatPanel extends JPanel {
 		if (onSendMessageListener != null) {
 			onSendMessageListener.accept(content);
 		}
-	    
+
 	    // 입력창 초기화
 	    inputField.setText("");
 	}
 
 	//-----------------------------------채팅창에 메세지 입력하는 메서드--------------------
 	public void addPublicMessage(String senderName, String content, LocalDateTime timestamp) {
-	//controller에게 인자 값으로 이름, 내용, 시간 받음
-		StyledDocument doc = chatArea.getStyledDocument(); //스타일doc으로 채팅area설정함. (색넣어야해서)
-		String time = timestamp.format(timeFormatter); // LocalDateTime을 "HH:mm" 형식으로
+		SwingUtilities.invokeLater(() -> {
+			//controller에게 인자 값으로 이름, 내용, 시간 받음
+			StyledDocument doc = chatArea.getStyledDocument(); //스타일doc으로 채팅area설정함. (색넣어야해서)
+			String time = timestamp.format(timeFormatter); // LocalDateTime을 "HH:mm" 형식으로
 
-		try {
-			SimpleAttributeSet style = new SimpleAttributeSet(); //글씨 스타일 변경위해서 style객체 생성
-			StyleConstants.setForeground(style, Color.BLACK); // 글자색 = 검정
+			try {
+				SimpleAttributeSet style = new SimpleAttributeSet(); //글씨 스타일 변경위해서 style객체 생성
+				StyleConstants.setForeground(style, Color.BLACK); // 글자색 = 검정
 
-			String message = senderName + ": " + content + "  | " + time + "\n\n"; //이건 채팅창에 띄울 메세지 포맷
-			doc.insertString(doc.getLength(), message, style); //doc에 해당 메세지를 넣어줌
+				String message = senderName + ": " + content + "  | " + time + "\n\n"; //이건 채팅창에 띄울 메세지 포맷
+				doc.insertString(doc.getLength(), message, style); //doc에 해당 메세지를 넣어줌
 
 
-			chatArea.setCaretPosition(doc.getLength());// 스크롤을 맨 아래로
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
+				chatArea.setCaretPosition(doc.getLength());// 스크롤을 맨 아래로
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	//---------------------------잊방 메세지!-------------------
 	public void addSystemMessage(String content) {
-
+		SwingUtilities.invokeLater(() -> {
 		StyledDocument doc = chatArea.getStyledDocument();
 		String time = LocalDateTime.now().format(timeFormatter);
 
@@ -174,12 +177,12 @@ public class ChatPanel extends JPanel {
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-
+		});
 	}
 
 	//--------------------귓속말 메세지-----------------위에랑 다른거 별로 없음 걍 복붙
 	public void addWhisperMessage(String senderName, String recipientName, String content, LocalDateTime timestamp) {
-
+		SwingUtilities.invokeLater(() -> {
 		StyledDocument doc = chatArea.getStyledDocument();
 		String time = timestamp.format(timeFormatter);
 
@@ -195,13 +198,15 @@ public class ChatPanel extends JPanel {
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-
+		});
 	}
 
 
 	// 접속자 수 업데이트
 	public void updateUserCount(int count) {
+		SwingUtilities.invokeLater(() -> {
 		inOneSuLabel.setText("👤 " + count);
+		});
 	}
-	
+
 }

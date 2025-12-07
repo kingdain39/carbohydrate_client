@@ -24,11 +24,11 @@ public class ChatController {
     }
     
  // 초기화 (View 연결)
-    public void initialize(ChatPanel view, Long userId, String jwtToken,Runnable onConnected) {
+    public void initialize(ChatPanel view, Long userId, String userName, String jwtToken,Runnable onConnected) {
         this.chatView = view;
         
         // Service  -> Controller 리스너 등록
-        chatService.initialize(userId,jwtToken, this::handleIncomingMessage, onConnected);
+        chatService.initialize(userId, userName, jwtToken, this::handleIncomingMessage, onConnected);
         userStateService.setUserListListener(this::handleUserListUpdate);
         
         // View ->  Controller 이벤트 연결
@@ -99,6 +99,8 @@ public class ChatController {
         
         
         chatService.sendWhisper(recipientId, message);
+
+        chatView.addWhisperMessage("나", recipientName, message, java.time.LocalDateTime.now());
     }
     
     public void onDisconnect() {
@@ -138,7 +140,10 @@ public class ChatController {
         }
     }
     private void handleUserListUpdate(Set<String> users) {
-        //chatView.updateUserList(users);
+        if (chatView != null) {
+            chatView.updateUserCount(users.size());
+            System.out.println("인원수 갱신됨: " + users.size() + "명"); // 로그 확인용
+        }
     }
     
     

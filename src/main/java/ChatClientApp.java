@@ -115,7 +115,7 @@ public class ChatClientApp extends JFrame {
         chatPanel.addSystemMessage("서버에 연결 중...");
 
         //컨트롤러 초기화!!! 연결 완료 시 자동으로 팝업 띄우기
-        chatController.initialize(chatPanel, userId, jwtToken, () -> {
+        chatController.initialize(chatPanel, userId, userName, jwtToken, () -> {
             // 이 부분이 연결 완료 후 실행됨!
             SwingUtilities.invokeLater(() -> {
                 int result = JOptionPane.showConfirmDialog(
