@@ -8,8 +8,7 @@ import dto.ChatSendRequest;
 import dto.JoinRequest;
 import dto.WhisperRequest;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 //비지니스 로직
@@ -24,8 +23,9 @@ public class ChatService {
 	private Consumer<ChatMessageResponse> onMessageReceived;
     private Runnable onConnected; //접속 되었는지 알려줄 콜뱃
 	
-	public ChatService(NetworkService networkService) {
+	public ChatService(NetworkService networkService, UserStateService userService) {
 		this.networkService=networkService;
+        this.userService = userService;
 		this.objectMapper= new ObjectMapper();
 		this.objectMapper.registerModule(new JavaTimeModule());
 		
@@ -125,12 +125,16 @@ public class ChatService {
     }
     
     private void handleUserListMessage(String json) {
-    	try {
-            Map<String, Long> users = objectMapper.readValue(
-                json, new TypeReference<Map<String, Long>>() {}
+        try {
+            Map<String, Long> userMap = objectMapper.readValue(
+                    json, new TypeReference<Map<String, Long>>() {}
             );
-            userService.updateActiveUsers(users); // UserStateService 갱신
-        } catch (Exception e) {
+
+            userService.updateActiveUsers(userMap);
+
+            System.out.println("사용자 목록 갱신됨: " + userMap); // 로그 확인용
+
+        }catch (Exception e) {
             e.printStackTrace();
         }
 	}

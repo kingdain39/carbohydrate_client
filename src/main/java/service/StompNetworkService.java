@@ -93,6 +93,7 @@ public class StompNetworkService implements NetworkService{
 		}
 
 		StompHeaders headers = new StompHeaders();
+		headers.setDestination(destination);
 		headers.setContentType(org.springframework.util.MimeTypeUtils.APPLICATION_JSON);
 
 		session.send(headers, payload);

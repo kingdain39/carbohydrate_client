@@ -39,8 +39,8 @@ public class ChatClientApp extends JFrame {
         this.authService = new AuthService("http://localhost:8080");
 
         StompNetworkService networkService = new StompNetworkService();
-        this.chatService = new ChatService(networkService);
         this.userStateService = new UserStateService();
+        this.chatService = new ChatService(networkService, userStateService);
         this.chatController = new ChatController(chatService, userStateService);
 
         // CardLayout 설정
