@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,6 +8,12 @@
   <groupId>carbohydrate_client</groupId>
   <artifactId>carbohydrate_client</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <build>
     <sourceDirectory>client/src</sourceDirectory>
@@ -21,50 +28,20 @@
     </plugins>
   </build>
 
-  <!-- ✅ 라이브러리 의존성 -->
   <dependencies>
-    <!-- STOMP/WebSocket 지원 -->
+    <!-- Spring Boot WebSocket Starter (이게 필요한 모든 것 포함) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
-      <version>3.3.5</version>
+      <version>3.2.5</version>
     </dependency>
 
-    <!-- Messaging (StompSessionHandler, StompSessionHandlerAdapter 포함) -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-messaging</artifactId>
-      <version>6.1.5</version>
-    </dependency>
-
-    <!-- JSON 변환기 (MappingJackson2MessageConverter에 필요) -->
+    <!-- Jackson JSON -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.17.2</version>
-    </dependency>
-    <dependency>
-    	<groupId>chatapp</groupId>
-    	<artifactId>chatapp</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
+      <version>2.17.0</version>
     </dependency>
   </dependencies>
-
-  <!-- ✅ SNAPSHOT 저장소 (필요할 경우) -->
-  <repositories>
-    <repository>
-      <id>spring-snapshots</id>
-      <name>Spring Snapshots</name>
-      <url>https://repo.spring.io/snapshot</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>spring-milestones</id>
-      <name>Spring Milestones</name>
-      <url>https://repo.spring.io/milestone</url>
-    </repository>
-  </repositories>
 
 </project>
