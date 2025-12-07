@@ -1,4 +1,5 @@
 import controller.ChatController;
+import dto.LoginResponse;
 import service.AuthService;
 import service.ChatService;
 import service.StompNetworkService;
@@ -22,6 +23,7 @@ public class ChatClientApp extends JFrame {
     // 로그인 후 저장할 정보
     private Long myId;
     private String myName;
+    private String jwtToken;
 
     private AuthService authService;
     private ChatService chatService;
@@ -89,10 +91,10 @@ public class ChatClientApp extends JFrame {
     private void onLoginAttempt(String username, String password) {
         try {
             // AuthService로 로그인 요청
-            Long userId = authService.login(username, password);
+            LoginResponse loginResponse = authService.login(username, password);
 
             // 로그인 성공
-            onLoginSuccess(userId, username);
+            onLoginSuccess(loginResponse.getUserId(), username, loginResponse.getToken());
 
         } catch (AuthService.AuthException e) {
             // 로그인 실패
@@ -101,21 +103,37 @@ public class ChatClientApp extends JFrame {
     }
 
     // 로그인 성공 시
-    private void onLoginSuccess(Long userId, String userName) {
+    private void onLoginSuccess(Long userId, String userName, String jwtToken) {
         this.myId = userId;
         this.myName = userName;
+        this.jwtToken = jwtToken;
 
         System.out.println("로그인 성공! ID: " + userId + ", 이름: " + userName);
 
-        //컨트롤러 초기화!!! 하고 챗 패널 연결!
-        chatController.initialize(chatPanel, userId);
-
-        // 채팅 화면으로 전환
         chatPanel.setUserInfo(userId, userName);
         cardLayout.show(mainPanel, "CHAT");
+        chatPanel.addSystemMessage("서버에 연결 중...");
 
-        // 입장 메세지
-       chatPanel.addSystemMessage(userName + "님이 입장하셨습니다.");
+        //컨트롤러 초기화!!! 연결 완료 시 자동으로 팝업 띄우기
+        chatController.initialize(chatPanel, userId, jwtToken, () -> {
+            // 이 부분이 연결 완료 후 실행됨!
+            SwingUtilities.invokeLater(() -> {
+                int result = JOptionPane.showConfirmDialog(
+                        this,
+                        userName + "님, 서버 연결이 완료되었습니다!\n채팅방에 입장하시겠습니까?",
+                        "연결 완료",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                if (result == JOptionPane.OK_OPTION) {
+                    chatService.joinChatRoom();
+                    chatPanel.addSystemMessage("채팅방에 입장했습니다!");
+                } else {
+                    chatPanel.addSystemMessage("입장 대기 중입니다.");
+                }
+            });
+        });
     }
 
     // 화면 전환 메서드

@@ -2,6 +2,7 @@ package service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.LoginResponse;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -19,10 +20,10 @@ public class AuthService {
 
     /**
      * 로그인
-     * @return userId
+     * @return LoginResponse (userId + JWT 토큰)
      * @throws AuthException 로그인 실패 시
      */
-    public Long login(String username, String password) throws AuthException {
+    public LoginResponse login(String username, String password) throws AuthException {  // ← 수정!
         try {
             URL url = new URL(serverUrl + "/api/v1/users/login");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -48,19 +49,30 @@ public class AuthService {
                 }
                 String response = sb.toString();
 
-                // JSON 파싱 - userId 추출
+                // JSON 파싱
                 JsonNode jsonNode = objectMapper.readTree(response);
 
-                // 서버 응답에 userId 필드가 있다고 가정 (없으면 팀원한테 확인)
+                // userId 추출
+                Long userId = null;
                 if (jsonNode.has("userId")) {
-                    return jsonNode.get("userId").asLong();
+                    userId = jsonNode.get("userId").asLong();
                 } else if (jsonNode.has("id")) {
-                    return jsonNode.get("id").asLong();
-                } else {
-                    // userId 필드를 못 찾으면 임시로 랜덤 (나중에 수정)
-                    System.err.println("Warning: userId not found in response, using random");
-                    return (long) (Math.random() * 10000);
+                    userId = jsonNode.get("id").asLong();
                 }
+
+                // JWT 토큰 추출
+                String token = null;
+                if (jsonNode.has("token")) {
+                    token = jsonNode.get("token").asText();
+                } else if (jsonNode.has("accessToken")) {
+                    token = jsonNode.get("accessToken").asText();
+                }
+
+                if (userId == null || token == null) {
+                    throw new AuthException("서버 응답에 필요한 정보가 없습니다.");
+                }
+
+                return new LoginResponse(userId, token);  //  여기서 반환!!!!!!!!!!!!!!!!!!!!!
 
             } else {
                 throw new AuthException("로그인 실패: 아이디 또는 비밀번호가 잘못되었습니다.");

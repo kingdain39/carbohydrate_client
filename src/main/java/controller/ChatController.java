@@ -24,21 +24,25 @@ public class ChatController {
     }
     
  // 초기화 (View 연결)
-    public void initialize(ChatPanel view, Long userId) {
+    public void initialize(ChatPanel view, Long userId, String jwtToken,Runnable onConnected) {
         this.chatView = view;
         
-        // Service → Controller 리스너 등록
-        chatService.initialize(userId, this::handleIncomingMessage);
+        // Service  -> Controller 리스너 등록
+        chatService.initialize(userId,jwtToken, this::handleIncomingMessage, onConnected);
         userStateService.setUserListListener(this::handleUserListUpdate);
         
-        // View → Controller 이벤트 연결
+        // View ->  Controller 이벤트 연결
         view.setOnSendMessage(this::onSendButtonClick);
         //view.setOnSendWhisper(this::onWhisperButtonClick); //우리 어차피 귓속말 버튼 없이 /w로 파싱하니까 없앰.
         view.setOnDisconnect(this::onDisconnect);
         view.setOnJoin(this::onJoinButtonClick); 
     }
     
-    //View → Service 
+    //View → Service
+    //서버연결 완료 되엇을때 실행
+    private void onWebSocketConnected() {
+        chatView.addSystemMessage("서버에 연결되었습니다!");
+    }
     
     // 유저가 "입장 버튼" 클릭했을 때 실행
     public void onJoinButtonClick() {

@@ -4,8 +4,13 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
+import org.springframework.util.MimeTypeUtils;
+
+
+
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -25,22 +30,27 @@ public class StompNetworkService implements NetworkService{
     }
 
 	@Override
-	public void connect(String url, Runnable onConnected, Consumer<Throwable> onError) {
+	public void connect(String url,  String jwtToken, Runnable onConnected, Consumer<Throwable> onError) {
 		// TODO Auto-generated method stub
 		StompSessionHandler sessionHandler = new StompSessionHandlerAdapter() {
-			
-			public void afterConnected(StompSession session) {
+
+			public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
 				StompNetworkService.this.session=session;
 				onConnected.run();
 			}
-			
-			public void handleException(StompSession session,StompCommand c, 
+
+			public void handleException(StompSession session,StompCommand c,
                     StompHeaders h, byte[] p, Throwable ex ) {
 					onError.accept(ex);
 			}
 		};
-		stompClient.connect(url, sessionHandler);
-	
+		//http헤더도 만들어줌(웹소켓연결용)
+		WebSocketHttpHeaders httpHeaders = new WebSocketHttpHeaders();
+		//STOMP헤더 생성하는 로직(JWT건네주는 거 반영함)
+		StompHeaders headers = new StompHeaders();
+		headers.add("Authorization", "Bearer " + jwtToken);
+		stompClient.connect(url, httpHeaders, headers, sessionHandler);
+
 	}
 
 	@Override
@@ -64,12 +74,13 @@ public class StompNetworkService implements NetworkService{
 	        session.subscribe(destination, new StompFrameHandler() {
 	            @Override
 	            public Type getPayloadType(StompHeaders headers) {
-	                return String.class; //메시지를 어떻게 받을지 정의.메시지를 문자열로 받음
+	                return byte[].class; //메시지를 어떻게 받을지 정의.메시지를 문자열로 받음 ----->오류나서 바이트로 받는걸로 수정
 	            }
 	            
 	            @Override
 	            public void handleFrame(StompHeaders headers, Object payload) {
-	                handler.handle((String) payload); //payload를 string으로 캐스팅 후 처리
+	                String json = new String((byte[]) payload);  // 바이트를 string으로 받도록 수정
+					handler.handle(json);
 	            }
 	        });
 	}
@@ -80,7 +91,11 @@ public class StompNetworkService implements NetworkService{
 		if (session == null || !session.isConnected()) {
 			throw new IllegalStateException("Not connected");
 		}
-		session.send(destination, payload);
+
+		StompHeaders headers = new StompHeaders();
+		headers.setContentType(org.springframework.util.MimeTypeUtils.APPLICATION_JSON);
+
+		session.send(headers, payload);
 	}
 
 	@Override

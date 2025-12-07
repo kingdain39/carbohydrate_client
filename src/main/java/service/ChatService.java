@@ -18,9 +18,11 @@ public class ChatService {
 	private final ObjectMapper objectMapper;//json 객체 변환기
 	private Long currentUserId;//현재 사용자 id
 	private UserStateService userService;
+    private String jwtToken;
 	
 	//이벤트 리스너 (Controller가 등록)
 	private Consumer<ChatMessageResponse> onMessageReceived;
+    private Runnable onConnected; //접속 되었는지 알려줄 콜뱃
 	
 	public ChatService(NetworkService networkService) {
 		this.networkService=networkService;
@@ -30,21 +32,28 @@ public class ChatService {
 	}
 	
 	// 연결 및 구독 초기화
-    public void initialize(Long userId, Consumer<ChatMessageResponse> messageListener) {
+    public void initialize(Long userId, String jwtToken, Consumer<ChatMessageResponse> messageListener, Runnable onConnectedCallback) {
         this.currentUserId = userId;
         this.onMessageReceived = messageListener;
-        
+
         String serverUrl = "ws://localhost:8080/ws";
-        
-        networkService.connect(
-            serverUrl,
-            () -> onConnected(null),  // 연결 성공 시
-            this::onError       // 에러 발생 시
+
+        networkService.connect(serverUrl, jwtToken,
+                () -> {
+                    System.out.println("WebSocket Connected");
+                    if (onConnectedCallback != null) {
+                        onConnectedCallback.run();  // 콜백 실행!!!!
+                    }
+                },
+                this::onError
         );
     }
     
 	private void onConnected(Object object) {
-        System.out.println("WebSocket Connected");        
+        System.out.println("WebSocket Connected");
+        if (this.onConnected != null) {
+            this.onConnected.run();  //연결 완료되면 콜백 실행!!
+        }
         }
     
     private void onError(Throwable error) {
