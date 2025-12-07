@@ -22,8 +22,8 @@ public class ChatService {
 	//이벤트 리스너 (Controller가 등록)
 	private Consumer<ChatMessageResponse> onMessageReceived;
 	
-	public ChatService(NetworkService netwrokService) {
-		this.networkService=netwrokService;
+	public ChatService(NetworkService networkService) {
+		this.networkService=networkService;
 		this.objectMapper= new ObjectMapper();
 		this.objectMapper.registerModule(new JavaTimeModule());
 		
