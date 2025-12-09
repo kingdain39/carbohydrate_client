@@ -74,7 +74,7 @@ public class ChatService {
         // 구독 먼저
         networkService.subscribe("/topic/public", this::handlePublicMessage);
         networkService.subscribe("/topic/private/" + currentUserName, this::handleWhisperMessage);
-        networkService.subscribe("/user/queue/history", this::handleHistoryMessage);
+        networkService.subscribe("/topic/history/" + currentUserId, this::handleHistoryMessage);
         networkService.subscribe("/topic/users", this::handleUserListMessage);
 
         // 그 다음 입장 요청
